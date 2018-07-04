@@ -4,10 +4,10 @@ let activities = document.querySelectorAll('.activities input');
 var activityTitle = document.querySelectorAll(".activities legend");
 var inputRefs = document.querySelectorAll("#name, #mail, #cc-num, #zip, #cvv");
 let checkedValidation = false;
-
+let payMethod;
 //Regular expessions for input validation
 let nameReg = /^[A-Za-z ]+$/
-let emailReg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+let emailReg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 let cardReg = /^[0-9]{13,16}$/
 let zipReg = /^[0-9]{5}$/
 let cvvReg = /^[0-9]{3}$/
@@ -92,18 +92,22 @@ $('.activities label').on('change', function(e){
           // String matches are compared to disable other conflicting times
           let am = activities[i].parentNode.textContent.match(/9am/);
           let pm = activities[i].parentNode.textContent.match(/4pm/);
+          let tues = activities[i].parentNode.textContent.match(/Tuesday/);
 
           /* If any of the activities contain the same time as the one clicked, whilst it remains checked, disable
           those activities.
           */
 
-          if( am && clicked.includes('9am') && e.target.checked || pm && clicked.includes('4pm') && e.target.checked  )
+          if(  tues && am && clicked.includes('9am') && !clicked.includes('Wednesday') && e.target.checked ||
+               tues && pm && clicked.includes('4pm') && !clicked.includes('Wednesday') && e.target.checked  )
           {
               activities[i].disabled = true;
               $(activities[i].parentNode).addClass('booked');
               $(e.target.parentNode).removeClass('booked');
+              console.log(i);
           //Otherwise enable checkboxes
-           } else if( am && clicked.includes('9am') && !e.target.checked || pm && clicked.includes('4pm') && !e.target.checked )
+        }
+         else if( am && clicked.includes('9am') && !e.target.checked || pm && clicked.includes('4pm') && !e.target.checked )
             {
                activities[i].disabled = false;
                $(activities[i].parentNode).removeClass('booked');
@@ -132,71 +136,89 @@ $('.activities label').on('change', function(e){
        });
 
 //vvvvvvvvvvvvvvv Payment Type  vvvvvvvvvvvvvvvvvvv
+
 $('#payment').on('change', function(){
+  let paymentMethod = document.getElementById('payment').value;
   //Hide irrelevant informaiton
   $(".credit-card").hide();
   $(".paypal").hide();
   $(".bitcoin").hide();
   //Show information relating to the payment method selected
-  let paymentMethod = document.getElementById('payment').value;
+  // validate if paypal or bitcoin to allow submission if card fields are empty
   switch (paymentMethod){
       case "credit card":
         $(".credit-card").show();
+        cardField.valid = false;
+        zipField.valid = false;
+        cvvField.valid = false;
       break;
       case "paypal":
+        cardField.valid = true;
+        zipField.valid = true;
+        cvvField.valid = true;
         $(".paypal").show();
+
       break;
       case "bitcoin":
+        cardField.valid = true;
+        zipField.valid = true;
+        cvvField.valid = true;
         $(".bitcoin").show();
       break;
     }
 });
 
-//vvvvvvvvvvvvvvv Submission  vvvvvvvvvvvvvvvvvvv
-
-$('button, input[type="submit"]').on('click', function(e){
-
-  //After failed submission, dynamically validate
-  // For exceeds expectations grade
- document.addEventListener('keyup', function(event) {
-   validate(inputRefs);
- });
-
- if(fieldsArr.every(inputsValid) === true && checkedValidation){
-      console.log("Valid");
-    } else if (fieldsArr.every(inputsValid) === false || !checkedValidation)
-      {
-        //If any fields are not valid, prevent submission
-        e.preventDefault();
-      }
-    //Run validation when sibmitting form
-    validate(inputRefs);
-});
-
-//vvvvvvvvvvvvvvv Validation  vvvvvvvvvvvvvvvvvvv
 
   function validate(inputsArray){
-    /*inputsArray holds the DOM selection references for the text inputs, while fieldsArry
+    payMethod = document.getElementById('payment').value;
+
+    /* inputsArray holds the DOM selection references for the text inputs, while fieldsArry
       contains the objects used to validate and manipulate content
     */
-    //Loop through inputs
-      for (let i = 0; i < inputsArray.length; i++){
-      // Remove warnings
-       inputsArray[i].previousElementSibling.innerText = fieldsArr[i].name;
-       $(inputsArray[i].previousElementSibling).removeClass('invalid');
-      // Test the inputs. If any fail, add warnings
-       if(fieldsArr[i].regex.test(inputsArray[i].value) == false){
+
+    // Remove warnings
+    for (let i = 0; i < inputsArray.length; i++){
+     inputsArray[i].previousElementSibling.innerText = fieldsArr[i].name;
+     $(inputsArray[i].previousElementSibling).removeClass('invalid');
+  }
+
+
+    // Test the credit card fields
+    for (let i = 2; i < inputsArray.length; i++){
+
+      if (payMethod == "credit card"){
+      if(fieldsArr[i].regex.test(inputsArray[i].value) == false && i >= 1){
+          inputsArray[i].previousElementSibling.innerHTML = fieldsArr[i].invalidText;
+          $(inputsArray[i].previousElementSibling).addClass('invalid');
+          //Store failure in the failed object
+          fieldsArr[i].valid = false;
+        } else {
+          fieldsArr[i].valid = true;
+        }
+
+    } else if (payMethod !== "credit card"){
+      cardField.valid = true;
+      zipField.valid = true;
+      cvvField.valid = true;
+    }
+  }
+    console.log(payMethod);
+
+
+
+  // Test the name and email fields
+for (let i = 0; i < 2; i++){
+       if(fieldsArr[i].regex.test(inputsArray[i].value) == false && i <= 1){
            inputsArray[i].previousElementSibling.innerHTML = fieldsArr[i].invalidText;
            $(inputsArray[i].previousElementSibling).addClass('invalid');
            //Store failure in the failed object
            fieldsArr[i].valid = false;
-
          }
         // Otherwise store success
-         else {
+         if (fieldsArr[i].regex.test(inputsArray[i].value) == true && i <= 1){
              fieldsArr[i].valid = true;
-
          }
+       }
 
          // If no activities are checked, give warning
          if (!checkedValidation){
@@ -214,16 +236,43 @@ $('button, input[type="submit"]').on('click', function(e){
 
           if(inputsArray[4].value.length >= 4 || inputsArray[4].value.length <= 2){
             inputsArray[4].previousElementSibling.innerText =  "CVV Must be 3 digits long";
-
           }
 
-      }
+
   };
+
+  //vvvvvvvvvvvvvvv Submission  vvvvvvvvvvvvvvvvvvv
+
+  $('button, input[type="submit"]').on('click', function(e){
+
+validate(inputRefs);
+    //After failed submission, dynamically validate
+    // For exceeds expectations grade
+   document.addEventListener('keyup', function(event) {
+     validate(inputRefs);
+
+   });
+
+   if(fieldsArr.every(inputsValid) === true && checkedValidation){
+        console.log("Valid");
+          //e.preventDefault();
+      } else if (fieldsArr.every(inputsValid) === false || !checkedValidation)
+        {
+          //If any fields are not valid, prevent submission
+          e.preventDefault();
+        }
+      //Run validation when sibmitting form
+
+  });
+
+  //vvvvvvvvvvvvvvv Validation  vvvvvvvvvvvvvvvvvvv
 
   // This function distills all tests into a single boolean
   // - only if all the objects 'valid' values are true, it returns 'true'
   function inputsValid(el) {
+
     return(el.valid);
+
   }
 
 
