@@ -1,6 +1,6 @@
 document.getElementById('name').focus();
 //Get references for inputs and 'activities' heading
-let activities = document.querySelectorAll('.activities input');
+let activities = document.querySelectorAll(".activities input");
 var activityTitle = document.querySelectorAll(".activities legend");
 var inputRefs = document.querySelectorAll("#name, #mail, #cc-num, #zip, #cvv");
 let checkedValidation = false;
@@ -13,7 +13,7 @@ let zipReg = /^[0-9]{5}$/
 let cvvReg = /^[0-9]{3}$/
 
 //Hide elements that aren't relevant to the opening state of the page
-$('#other-title').hide();
+$("#other-title").hide();
 $(".credit-card").next().hide();
 $(".credit-card").next().next().hide();
 
@@ -37,10 +37,10 @@ let fieldsArr = [nameField, emailField, cardField, zipField, cvvField];
 
 //Hide jobRole text area unless 'other' is selected
 function jobRole(){
- if (document.getElementById('title').value === 'other'){
-    $('#other-title').fadeIn(500);
+ if (document.getElementById("title").value === "other"){
+    $("#other-title").fadeIn(500);
  } else {
-   $('#other-title').fadeOut(200);
+   $("#other-title").fadeOut(200);
  }
 }
 
@@ -57,9 +57,9 @@ function tShirtInfo(){
   //Hide options and colors unless a design is selected
   // For exceeds expectations grade
     $(colors).hide();
-    if (design == 'Select Theme'){
-      $('#colors-js-puns').hide();
-    } else {$('#colors-js-puns').show();
+    if (design == "Select Theme"){
+      $("#colors-js-puns").hide();
+    } else {$("#colors-js-puns").show();
 
 //Find matches between color and design text
    for (let i = 0; i < colors.length; i++){
@@ -76,11 +76,11 @@ function tShirtInfo(){
 
 //vvvvvvvvvvvvvvv Activities Checkboxes  vvvvvvvvvvvvv
 
-$('.activities label').on('change', function(e){
+$(".activities label").on("change", function(e){
   let total = 0;
   let totalArray = [];
 // Show warnings dynamically after first invalid submission attempt
-  $(activityTitle).addClass('invalid');
+  $(activityTitle).addClass("invalid");
     //Invalid to submit until proven true through testing
       checkedValidation = false;
       // Hide total unless any boxes are checked
@@ -98,19 +98,19 @@ $('.activities label').on('change', function(e){
           those activities.
           */
 
-          if(  tues && am && clicked.includes('9am') && !clicked.includes('Wednesday') && e.target.checked ||
-               tues && pm && clicked.includes('4pm') && !clicked.includes('Wednesday') && e.target.checked  )
+          if(  tues && am && clicked.includes('9am') && !clicked.includes("Wednesday") && e.target.checked ||
+               tues && pm && clicked.includes('4pm') && !clicked.includes("Wednesday") && e.target.checked  )
           {
               activities[i].disabled = true;
-              $(activities[i].parentNode).addClass('booked');
-              $(e.target.parentNode).removeClass('booked');
+              $(activities[i].parentNode).addClass("booked");
+              $(e.target.parentNode).removeClass("booked");
               console.log(i);
           //Otherwise enable checkboxes
         }
-         else if( am && clicked.includes('9am') && !e.target.checked || pm && clicked.includes('4pm') && !e.target.checked )
+         else if( am && clicked.includes("9am") && !e.target.checked || pm && clicked.includes("4pm") && !e.target.checked )
             {
                activities[i].disabled = false;
-               $(activities[i].parentNode).removeClass('booked');
+               $(activities[i].parentNode).removeClass("booked");
             }
           };
           //Loop through and find all checked boxes
@@ -137,8 +137,8 @@ $('.activities label').on('change', function(e){
 
 //vvvvvvvvvvvvvvv Payment Type  vvvvvvvvvvvvvvvvvvv
 
-$('#payment').on('change', function(){
-  let paymentMethod = document.getElementById('payment').value;
+$("#payment").on("change", function(){
+  let paymentMethod = document.getElementById("payment").value;
   //Hide irrelevant informaiton
   $(".credit-card").hide();
   $(".paypal").hide();
@@ -170,7 +170,7 @@ $('#payment').on('change', function(){
 
 
   function validate(inputsArray){
-    payMethod = document.getElementById('payment').value;
+    payMethod = document.getElementById("payment").value;
 
     /* inputsArray holds the DOM selection references for the text inputs, while fieldsArry
       contains the objects used to validate and manipulate content
@@ -179,17 +179,17 @@ $('#payment').on('change', function(){
     // Remove warnings
     for (let i = 0; i < inputsArray.length; i++){
      inputsArray[i].previousElementSibling.innerText = fieldsArr[i].name;
-     $(inputsArray[i].previousElementSibling).removeClass('invalid');
+     $(inputsArray[i].previousElementSibling).removeClass("invalid");
   }
 
 
-    // Test the credit card fields
+    // Test the credit card fields, validate them if 'credit card' isn't selected
     for (let i = 2; i < inputsArray.length; i++){
 
       if (payMethod == "credit card"){
       if(fieldsArr[i].regex.test(inputsArray[i].value) == false && i >= 1){
           inputsArray[i].previousElementSibling.innerHTML = fieldsArr[i].invalidText;
-          $(inputsArray[i].previousElementSibling).addClass('invalid');
+          $(inputsArray[i].previousElementSibling).addClass("invalid");
           //Store failure in the failed object
           fieldsArr[i].valid = false;
         } else {
@@ -210,7 +210,7 @@ $('#payment').on('change', function(){
 for (let i = 0; i < 2; i++){
        if(fieldsArr[i].regex.test(inputsArray[i].value) == false && i <= 1){
            inputsArray[i].previousElementSibling.innerHTML = fieldsArr[i].invalidText;
-           $(inputsArray[i].previousElementSibling).addClass('invalid');
+           $(inputsArray[i].previousElementSibling).addClass("invalid");
            //Store failure in the failed object
            fieldsArr[i].valid = false;
          }
@@ -222,7 +222,7 @@ for (let i = 0; i < 2; i++){
 
          // If no activities are checked, give warning
          if (!checkedValidation){
-            $(activityTitle).addClass('invalid');
+            $(activityTitle).addClass("invalid");
           }
           // Some conditional feedback for exceeds expectations grade, if more conditions were needed
           // update constructor to code DRY
@@ -243,12 +243,12 @@ for (let i = 0; i < 2; i++){
 
   //vvvvvvvvvvvvvvv Submission  vvvvvvvvvvvvvvvvvvv
 
-  $('button, input[type="submit"]').on('click', function(e){
+  $('button, input[type="submit"]').on("click", function(e){
 
 validate(inputRefs);
     //After failed submission, dynamically validate
     // For exceeds expectations grade
-   document.addEventListener('keyup', function(event) {
+   document.addEventListener("keyup", function(event) {
      validate(inputRefs);
 
    });
@@ -270,13 +270,9 @@ validate(inputRefs);
   // This function distills all tests into a single boolean
   // - only if all the objects 'valid' values are true, it returns 'true'
   function inputsValid(el) {
-
     return(el.valid);
-
   }
 
 
 jobRole();
 tShirtInfo();
-
-//
